@@ -1,0 +1,32 @@
+@@ -0,0 +1,31 @@
+import maya.cmds as cmds
+
+subnet = cmds.listRelatives("*subnet*")
+findptcl = cmds.listRelatives(subnet)
+while findptcl != None:
+    findptcl = cmds.listRelatives(subnet)
+    newsubnet = subnet
+    subnet = findptcl
+
+prtclCount = cmds.nParticle(newsubnet, q=True, ct=True)
+
+playbacktime = cmds.playbackOptions(q=True, aet=True)
+
+createLoc()
+
+def createLoc():
+    for i in range(0,prtclCount):
+        cmds.spaceLocator(n="particle"+str(i))
+        
+for t in range(1, int(playbacktime)+1):
+    for o in range(0,prtclCount):
+        prtclLocation = cmds.nParticle(newsubnet[0][:-5], q=True, id=o, attribute="position")
+        cmds.xform("particle"+str(o), t=prtclLocation)
+        cmds.setKeyframe("particle"+str(o))
+        if o==4:
+            if cmds.currentTime(q=True)<playbacktime:
+                cmds.currentTime(int(cmds.currentTime(q=True))+1)
+            else:
+                cmds.currentTime(1)
+        else:
+            print("continue to particle_loc #"+str(o+1))
